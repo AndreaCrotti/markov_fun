@@ -1,6 +1,13 @@
 #!/usr/bin/env boot
 
+(set-env! :dependencies '[[com.rpl/specter "1.0.2"]])
+(require '[com.rpl.specter :as specter])
+
 ;; add more dependencies if you need to
+
+(defn to-words
+  [text]
+  (re-seq #"\w+" text))
 
 (def sample-string "I am not a number! I am a free man!")
 (def sample-words (->> sample-string to-words))
@@ -16,7 +23,6 @@
   desired result is
   I #{[am not] [am a]}
   am #{[not a] [a free]}"
-
   [words size]
   (let [word-map (transient {})]
     (for [[pref s1 s2] (cycle-substrings words size)]
@@ -34,10 +40,6 @@
   "Generate a paragraph of the given length"
   [word-map length])
 
-(defn to-words
-  [text]
-  (re-seq #"\w+" text))
-
 (defn file-to-strings
   [filename]
   (->> filename
@@ -45,7 +47,8 @@
        to-words))
 
 (defn -main [& args]
-  (let [filename (nth args 1)
+  (print "Hello boot")
+  #_(let [filename (nth args 1)
         length (Integer/parseInt (nth args 2))
         strings (file-to-strings filename)
         wordmap (gen-wordmap strings)]
