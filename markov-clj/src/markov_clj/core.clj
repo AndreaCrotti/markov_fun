@@ -22,10 +22,12 @@
    word-map))
 
 (defn cycle-substrings
+  ;; TODO: should this also be a lazy-seq?
   [words size]
-  (apply concat
-         (for [n (range size)]
-           (partition size (drop n words)))))
+  (lazy-seq
+   (apply concat
+          (for [n (range size)]
+            (partition size (drop n words))))))
 
 (defn gen-wordmap
   "Generate the wordmap of prefixes and suffixesi
@@ -53,23 +55,17 @@
 
       (cons pref (rand-nth suffixes)))))
 
-(generate (gen-wordmap sample-words) 10)
-
 (defn file-to-strings
   [filename]
   (->> filename
        slurp
        to-words))
 
-(def bible-words (file-to-strings "pg10.txt"))
-(def bible-wordmap (gen-wordmap bible-words))
+(defn generate-full
+  [filename]
+  (let [words (file-to-strings filename)
+        word-map (gen-wordmap words)]
+    (generate word-map 10)))
 
 (defn -main [& args]
-  (print "Hello boot")
-  #_(let [filename (nth args 1)
-        length (Integer/parseInt (nth args 2))
-        strings (file-to-strings filename)
-        wordmap (gen-wordmap strings)]
-
-    (for [n (range length)]
-      (print (generate strings length)))))
+  (print "Hello boot"))
