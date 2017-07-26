@@ -13,3 +13,11 @@
       ["hello" "world"] {"hello" {"world" 1}}
       ["this" "is" "this" "are"] {"this" {"is" 1/2, "are" 1/2}
                                   "is" {"this" 1}})))
+
+(t/deftest uppers-lowers
+  (t/testing "Split in lowers and uppers"
+    (t/are [probs uppers-lowers]
+        (= (core/upper-lowers probs) uppers-lowers)
+
+      {"Hello" {"world" 1} "world" {"hi" 1}}
+      [{"Hello" {"world" 1}} {"world" {"hi" 1}}])))
