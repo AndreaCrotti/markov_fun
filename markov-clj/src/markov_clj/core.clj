@@ -81,38 +81,33 @@
 (def bible-probs (gen-probs
                   (file-to-strings "pgsmall.txt")))
 
+(defn pick-random-weighted
+  "Given a map of probability, pick a random element respecting the
+  given weights"
+  [probs]
+  (let [slices (vec (vals probs))
+        total (reduce + slices)
+        r (rand total)]
+
+    (loop [i 0 sum 0]
+      (if (< r (+ (slices i) sum))
+        (nth (keys probs) i)
+        (recur (inc i) (+ (slices i) sum))))))
 
 (defn gen-sentence
   [probs word size]
   (when (> size 0)
     (let [word-probs (get probs word)
-          next-el (rand-nth (seq word-probs))
-          next-word (first next-el)]
+          next-word (pick-random-weighted word-probs)]
+
       (print next-word " ")
       (gen-sentence probs next-word (dec size)))))
 
 (defn gen-string
   [probs size]
   (let [capitals (get-capitals probs)
-        first-el (rand-nth (seq (get-capitals probs)))
+        first-el (rand-nth (seq capitals))
         first-word (first first-el)]
 
     (print first-word " ")
     (gen-sentence probs first-word size)))
-
-
-(defn cumulate-probs
-  [up-to probs]
-  (apply + (take up-to (vals probs))))
-
-(defn gen-cumulative-probs
-  [probs]
-  (into {}
-        (map-indexed
-         (fn [idx [el prob]]
-           [el
-            [(cumulate-probs idx probs)
-             (cumulate-probs (inc idx) probs)]])
-         probs)))
-
-(gen-string bible-probs 10)
