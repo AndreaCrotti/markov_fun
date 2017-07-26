@@ -1,5 +1,6 @@
 (ns markov-clj.core
-  (:require [com.rpl.specter :as specter]))
+  (:require [com.rpl.specter :as specter]
+            [clojure.tools.cli :refer [parse-opts]]))
 
 (def sample-words ["God" "made" "the" "light"])
 
@@ -105,3 +106,13 @@
     (gen-sentence probs first-word size)))
 
 (gen-string bible-probs 10)
+
+(def cli-options
+  ;; An option with a required argument
+  [["-f" "--file" "File to use to generate the sentences from"] 
+   ["-h" "--help"]])
+
+(defn -main
+  [& args]
+  (let [options (parse-opts args cli-options)]
+    (prn options)))
