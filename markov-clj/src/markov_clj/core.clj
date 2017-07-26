@@ -57,26 +57,16 @@
 
 (file-to-strings "pgsmall.txt")
 
-;; TODO: not working as expected
-(defn split-capitalized
+(defn upper-lowers
   [probs]
-  ;; not really a transform in this case
-  ;; could do a select instead
-  (let [is-upper #(Character/isUpperCase (first %))
-        filter-fns [is-upper (complement is-upper)]]
+  (let [prefixes (keys probs)
+        is-upper #(Character/isUpperCase (first %))
+        is-lower (complement is-upper)
+        back-to-map #(into {} (for [k %] [k (get probs k)]))]
 
-    (for [f-fn filter-fns]
-      (specter/transform
-       [specter/MAP-KEYS f-fn]
-       identity
-       probs))))
-
-(defn get-capitals
-  [probs]
-  (into {}
-        (filter
-         (fn [[key val]] (Character/isUpperCase (first key)))
-         probs)))
+    (mapv back-to-map
+          [(filterv is-upper prefixes)
+           (filterv is-lower prefixes)])))
 
 (def bible-probs (gen-probs
                   (file-to-strings "pgsmall.txt")))
@@ -105,7 +95,7 @@
 
 (defn gen-string
   [probs size]
-  (let [capitals (get-capitals probs)
+  (let [capitals (first (upper-lowers probs))
         first-el (rand-nth (seq capitals))
         first-word (first first-el)]
 
