@@ -1,59 +1,53 @@
 (ns markov-clj.core
   (:require [com.rpl.specter :as specter]))
 
-;; add more dependencies if you need to
+(def sample-words ["God" "made" "the" "light"])
+
+(defn add-suffix
+  [word-map prefix suffix]
+  (specter/setval
+   [(specter/keypath prefix) specter/END] [suffix] word-map))
+
+(defn cycle-pref-suf
+  [words size]
+  (partition size 1 words))
+
+(defn analyze-text
+  ([pref-sufs]
+   (analyze-text pref-sufs {}))
+  
+  ([pref-sufs word-map]
+   (if (empty? pref-sufs)
+     word-map
+     (let [[pref suf] (first pref-sufs)
+           others (rest pref-sufs)]
+
+       (analyze-text
+        others
+        (add-suffix word-map pref suf))))))
+
+(defn compute-probabilities
+  [words]
+  (let [word-freq (seq (frequencies words))
+        total (count words)]
+
+    (into {}
+          (for [[el freq] word-freq]
+            [el (/ freq total)]))))
+
+(defn gen-probs
+  [words]
+  (let [analyzed (analyze-text (cycle-pref-suf words 2))]
+    (specter/transform
+     [specter/MAP-VALS]
+     compute-probabilities
+     analyzed)))
+
+(gen-probs sample-words)
 
 (defn to-words
   [text]
   (re-seq #"\w+" text))
-
-(def sample-string "I am not a number! I am a free man!")
-(def sample-words (->> sample-string to-words))
-
-(def simp {"I" #{["am" "groodt"] ["am" "super"]}})
-
-(defn- add-to-wordmap
-  "Fully functional way to modify a structure like
-  {prefix #{[s1 s2] [s3 s4]}}"
-  [word-map prefix value]
-  (specter/transform
-   (specter/keypath prefix)
-   #(into #{} (clojure.set/union % [value]))
-   word-map))
-
-(defn cycle-substrings
-  ;; TODO: should this also be a lazy-seq?
-  [words size]
-  (lazy-seq
-   (apply concat
-          (for [n (range size)]
-            (partition size (drop n words))))))
-
-(defn gen-wordmap
-  "Generate the wordmap of prefixes and suffixesi
-  desired result is
-  I #{[am not] [am a]}
-  am #{[not a] [a free]}"
-  ;; this should really support different sizes
-  ([words]
-   (gen-wordmap (cycle-substrings words 3) {}))
-
-  ([[[pref s1 s2] :as words] word-map]
-   (if (empty? words)
-     word-map
-     (let [new-map (add-to-wordmap word-map pref [s1 s2])]
-       (recur (rest words) new-map)))))
-
-(defn generate
-  "Generate a paragraph of the given length"
-  [word-map length]
-  (for [n (range length)
-        m (range (+ 4 (rand-int 6)))]
-
-    (let [pref (rand-nth (keys word-map))
-          suffixes (into [] (get word-map pref))]
-
-      (cons pref (rand-nth suffixes)))))
 
 (defn file-to-strings
   [filename]
@@ -61,11 +55,42 @@
        slurp
        to-words))
 
-(defn generate-full
-  [filename]
-  (let [words (file-to-strings filename)
-        word-map (gen-wordmap words)]
-    (generate word-map 10)))
+(file-to-strings "pgsmall.txt")
 
-(defn -main [& args]
-  (print "Hello boot"))
+(defn get-capitals
+  [probs]
+  (into {}
+        (filter
+         (fn [[key val]] (Character/isUpperCase (first key)))
+         probs)))
+
+;; (defn get-capitals-sp
+;;   [probs]
+;;   (specter/select
+;;    [specter/MAP-KEYS (specter/filterer #(Character/isUpperCase (first %)))]
+;;    probs))
+
+
+(def bible-probs (gen-probs
+                  (file-to-strings "pgsmall.txt")))
+
+
+(defn gen-sentence
+  [probs word size]
+  (when (> size 0)
+    (let [word-probs (get probs word)
+          next-el (rand-nth (seq word-probs))
+          next-word (first next-el)]
+      (print next-word " ")
+      (gen-sentence probs next-word (dec size)))))
+
+(defn gen-string
+  [probs size]
+  (let [capitals (get-capitals probs)
+        first-el (rand-nth (seq (get-capitals probs)))
+        first-word (first first-el)]
+
+    (print first-word " ")
+    (gen-sentence probs first-word size)))
+
+(gen-string bible-probs 10)
