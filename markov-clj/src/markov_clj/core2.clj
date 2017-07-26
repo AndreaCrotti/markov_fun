@@ -1,44 +1,30 @@
 (ns markov-clj.core2
   (:require [com.rpl.specter :as specter]))
 
-(def analyze-global (atom {}))
-
-(def sample-words
-  ["My" "name" "is" "Andrea" "and" "is" "not"])
-
-;; (def desired-output
-;;   {"My" ["name"]
-;;    "name" ["is"]
-;;    "is" []})
-
 (defn add-suffix
-  [atom-name prefix suffix]
-  (swap! atom-name
-         assoc prefix (into [] (cons suffix (get @atom-name prefix)))))
-
-;; (add-suffix analyze-global "pref" "suf2")
-
-;; (get @analyze-global "pref")
-
-{"my" ["name" "suff1"]
- "other" ["hello"]}
-
-{"my" {"name" 1/2
-       "suff1" 1/2}}
+  [word-map prefix suffix]
+  (specter/setval
+   [(specter/keypath prefix) specter/END] [suffix] word-map))
 
 (defn cycle-pref-suf
   [words size]
   (partition size 1 words))
 
 (defn analyze-text
-  [words]
-  (reset! analyze-global {})
-  (for [[pref suf] (cycle-pref-suf words 2)]
-    (add-suffix analyze-global pref suf)))
+  ([pref-sufs]
+   (analyze-text pref-sufs {}))
+  
+  ([pref-sufs word-map]
+   (if (empty? pref-sufs)
+     word-map
+     (let [[pref suf] (first pref-sufs)
+           others (rest pref-sufs)]
 
-(analyze-text sample-words)
-@analyze-global
-;; (partition 2 1 [1 2 3])
+       (analyze-text
+        others
+        (add-suffix word-map pref suf))))))
+
+(analyze-text (cycle-pref-suf sample-words 2))
 
 (defn compute-probabilities
   [words]
@@ -51,7 +37,7 @@
 
 (defn gen-probs
   [words]
-  (let [analyzed (last (analyze-text words))]
+  (let [analyzed (analyze-text (cycle-pref-suf words 2))]
     (specter/transform
      [specter/MAP-VALS]
      compute-probabilities
@@ -92,10 +78,10 @@
 (defn gen-sentence
   [probs word size]
   (when (> size 0)
-    (println word size)
     (let [word-probs (get probs word)
-          next-word (rand-nth (seq word-probs))]
-      (print next-word)
+          next-el (rand-nth (seq word-probs))
+          next-word (first next-el)]
+      (print next-word " ")
       (gen-sentence probs next-word (dec size)))))
 
 (defn gen-string
@@ -104,5 +90,7 @@
         first-el (rand-nth (seq (get-capitals probs)))
         first-word (first first-el)]
 
-    (print first-word)
+    (print first-word " ")
     (gen-sentence probs first-word size)))
+
+(gen-string bible-probs 10)
