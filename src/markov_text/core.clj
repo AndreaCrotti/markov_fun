@@ -57,8 +57,6 @@
        slurp
        to-words))
 
-(file-to-strings "pgsmall.txt")
-
 (defn upper-lowers
   [probs]
   (let [prefixes (keys probs)
@@ -70,8 +68,6 @@
           [(filterv is-upper prefixes)
            (filterv is-lower prefixes)])))
 
-(def bible-probs (gen-probs
-                  (file-to-strings "pgsmall.txt")))
 
 (defn pick-random-weighted
   "Given a map of probability, pick a random element respecting the
@@ -105,7 +101,10 @@
     (print first-word " ")
     (gen-sentence probs first-word size)))
 
-(gen-string bible-probs 10)
+#_(def bible-probs (gen-probs
+                    (file-to-strings "resources/sample_texts/pgsmall.txt")))
+
+#_(gen-string bible-probs 10)
 
 (def cli-options
   ;; An option with a required argument
