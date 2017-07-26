@@ -57,19 +57,26 @@
 
 (file-to-strings "pgsmall.txt")
 
+;; TODO: not working as expected
+(defn split-capitalized
+  [probs]
+  ;; not really a transform in this case
+  ;; could do a select instead
+  (let [is-upper #(Character/isUpperCase (first %))
+        filter-fns [is-upper (complement is-upper)]]
+
+    (for [f-fn filter-fns]
+      (specter/transform
+       [specter/MAP-KEYS f-fn]
+       identity
+       probs))))
+
 (defn get-capitals
   [probs]
   (into {}
         (filter
          (fn [[key val]] (Character/isUpperCase (first key)))
          probs)))
-
-;; (defn get-capitals-sp
-;;   [probs]
-;;   (specter/select
-;;    [specter/MAP-KEYS (specter/filterer #(Character/isUpperCase (first %)))]
-;;    probs))
-
 
 (def bible-probs (gen-probs
                   (file-to-strings "pgsmall.txt")))
