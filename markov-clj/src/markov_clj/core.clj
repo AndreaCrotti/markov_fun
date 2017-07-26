@@ -22,6 +22,7 @@
      (let [[pref suf] (first pref-sufs)
            others (rest pref-sufs)]
 
+       ;; TODO: use recursion more properly
        (analyze-text
         others
         (add-suffix word-map pref suf))))))
@@ -88,6 +89,7 @@
   [probs word size]
   (when (> size 0)
     (let [word-probs (get probs word)
+          ;;lower-letter-probs (second (upper-lowers word-probs))
           next-word (pick-random-weighted word-probs)]
 
       (print next-word " ")
@@ -101,3 +103,5 @@
 
     (print first-word " ")
     (gen-sentence probs first-word size)))
+
+(gen-string bible-probs 10)

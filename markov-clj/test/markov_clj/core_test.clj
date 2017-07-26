@@ -1,7 +1,6 @@
 (ns markov-clj.core-test
-  (:require [clojure.test :refer :all]
-            [markov-clj.core :refer :all]))
-
-(deftest a-test
-  (testing "FIXME, I fail."
-    (is (= 1 1))))
+  (:require [clojure.test :as t]
+            [markov-clj.core :as core]
+            [clojure.test.check.properties :as prop]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.clojure-test :refer [defspec]]))
