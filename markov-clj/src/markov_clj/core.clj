@@ -100,4 +100,19 @@
     (print first-word " ")
     (gen-sentence probs first-word size)))
 
+
+(defn cumulate-probs
+  [up-to probs]
+  (apply + (take up-to (vals probs))))
+
+(defn gen-cumulative-probs
+  [probs]
+  (into {}
+        (map-indexed
+         (fn [idx [el prob]]
+           [el
+            [(cumulate-probs idx probs)
+             (cumulate-probs (inc idx) probs)]])
+         probs)))
+
 (gen-string bible-probs 10)
