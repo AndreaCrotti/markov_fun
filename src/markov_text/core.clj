@@ -47,6 +47,7 @@
 
 (gen-probs sample-words)
 
+;; this should handle punctuation as well
 (defn to-words
   [text]
   (re-seq #"\w+" text))
@@ -84,7 +85,7 @@
 
 (defn gen-sentence
   [probs word size]
-  (when (> size 0)
+  (when (pos? size)
     (let [word-probs (get probs word)
           ;;lower-letter-probs (second (upper-lowers word-probs))
           next-word (pick-random-weighted word-probs)]
