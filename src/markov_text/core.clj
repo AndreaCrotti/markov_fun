@@ -2,8 +2,6 @@
   (:require [com.rpl.specter :as specter]
             [clojure.tools.cli :refer [parse-opts]]))
 
-(def sample-words ["God" "made" "the" "light"])
-
 (defn add-suffix
   [word-map prefix suffix]
   (specter/setval
@@ -47,8 +45,6 @@
      [specter/MAP-VALS]
      compute-probabilities
      analyzed)))
-
-(gen-probs sample-words)
 
 ;; this should handle punctuation as well
 (defn to-words
@@ -101,10 +97,11 @@
     (print first-word " ")
     (gen-sentence probs first-word size)))
 
-(def bible-words
+#_(def bible-words
   (file-to-strings "resources/sample_texts/pgsmall.txt"))
 
-(gen-string bible-words 10)
+#_(def divina
+  (file-to-strings "resources/sample_texts/divinacommedia.txt"))
 
 (def cli-options
   ;; An option with a required argument
