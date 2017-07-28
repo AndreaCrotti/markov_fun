@@ -14,6 +14,10 @@
   (partition size 1 words))
 
 (defn analyze-text
+  "Take prefixes and suffixes and return a data
+  structure keyed by prefix and with a vector
+  of possible suffixes as value
+  "
   ([pref-sufs]
    (analyze-text pref-sufs {}))
   
@@ -22,9 +26,8 @@
      word-map
      (let [[pref suf] (first pref-sufs)
            others (rest pref-sufs)]
-
-       ;; TODO: use recursion more properly
-       (analyze-text
+       
+       (recur
         others
         (add-suffix word-map pref suf))))))
 
@@ -32,7 +35,7 @@
   [words]
   (let [word-freq (seq (frequencies words))
         total (count words)]
-
+    
     (into {}
           (for [[el freq] word-freq]
             [el (/ freq total)]))))
@@ -58,17 +61,12 @@
        slurp
        to-words))
 
-(defn upper-lowers
-  [probs]
-  (let [prefixes (keys probs)
-        is-upper #(Character/isUpperCase (first %))
-        is-lower (complement is-upper)
-        back-to-map #(into {} (for [k %] [k (get probs k)]))]
-
-    (mapv back-to-map
-          [(filterv is-upper prefixes)
-           (filterv is-lower prefixes)])))
-
+(defn split-case
+  [words]
+  (letfn [(is-upper [s] (Character/isUpperCase (first s)))
+          (is-lower [s] (Character/isLowerCase (first s)))]
+    [(filterv is-lower words)
+     (filterv is-upper words)]))
 
 (defn pick-random-weighted
   "Given a map of probability, pick a random element respecting the
@@ -87,25 +85,26 @@
   [probs word size]
   (when (pos? size)
     (let [word-probs (get probs word)
-          ;;lower-letter-probs (second (upper-lowers word-probs))
           next-word (pick-random-weighted word-probs)]
 
       (print next-word " ")
       (gen-sentence probs next-word (dec size)))))
 
 (defn gen-string
-  [probs size]
-  (let [capitals (first (upper-lowers probs))
-        first-el (rand-nth (seq capitals))
-        first-word (first first-el)]
+  [words size]
+  (let [probs (gen-probs words)
+        [lowers uppers] (split-case words)
+        ;; this also favours the more probable since duplicates are
+        ;; still in the uppers list
+        first-word (rand-nth uppers)]
 
     (print first-word " ")
     (gen-sentence probs first-word size)))
 
-#_(def bible-probs (gen-probs
-                    (file-to-strings "resources/sample_texts/pgsmall.txt")))
+(def bible-words
+  (file-to-strings "resources/sample_texts/pgsmall.txt"))
 
-#_(gen-string bible-probs 10)
+(gen-string bible-words 10)
 
 (def cli-options
   ;; An option with a required argument

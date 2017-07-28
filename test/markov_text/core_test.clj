@@ -14,10 +14,19 @@
       ["this" "is" "this" "are"] {"this" {"is" 1/2, "are" 1/2}
                                   "is" {"this" 1}})))
 
-(t/deftest uppers-lowers
+(t/deftest uppers-lowers-test
   (t/testing "Split in lowers and uppers"
     (t/are [probs uppers-lowers]
-        (= (core/upper-lowers probs) uppers-lowers)
+        (= (core/split-case probs) uppers-lowers)
 
-      {"Hello" {"world" 1} "world" {"hi" 1}}
-      [{"Hello" {"world" 1}} {"world" {"hi" 1}}])))
+      ["hello" "world" "hi"]
+      [["hello" "world" "hi"] []])))
+
+
+(t/deftest analyze-text-test
+  (t/testing "First pass of analysis"
+    (t/are [pref-sufs analyzed]
+        (= (core/analyze-text pref-sufs) analyzed)
+      
+      [["hello" "world"] ["world" "hello"]] {"hello" ["world"]
+                                             "world" ["hello"]})))
