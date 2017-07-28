@@ -59,10 +59,11 @@
 
 (defn split-case
   [words]
-  (letfn [(is-upper [s] (Character/isUpperCase (first s)))
-          (is-lower [s] (Character/isLowerCase (first s)))]
-    [(filterv is-lower words)
-     (filterv is-upper words)]))
+  (let [is-upper #(Character/isUpperCase (first %))
+        is-lower (complement is-upper)]
+
+    (mapv #(filterv % words) [is-lower is-upper])))
+
 
 (defn pick-random-weighted
   "Given a map of probability, pick a random element respecting the
