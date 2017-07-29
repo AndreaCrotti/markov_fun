@@ -78,14 +78,22 @@
         (nth (keys probs) i)
         (recur (inc i) (+ (slices i) sum))))))
 
-(defn gen-sentence
+(defn gen-sentence-loop
+  ;; what happens if the given word has no suffix??
   [probs word size]
-  (when (pos? size)
-    (let [word-probs (get probs word)
-          next-word (pick-random-weighted word-probs)]
+  (loop [w word
+         n 0
+         words []]
 
-      (print next-word " ")
-      (gen-sentence probs next-word (dec size)))))
+    (if (= n (dec size))
+      words
+      ;; XXX: hacky way to finish the sentence early
+      (let [word-probs (get probs w {"." 1})
+            new-word (pick-random-weighted word-probs)]
+
+        (recur new-word
+               (inc n)
+               (conj words new-word))))))
 
 (defn gen-string
   [words size]
@@ -95,14 +103,7 @@
         ;; still in the uppers list
         first-word (rand-nth uppers)]
 
-    (print first-word " ")
-    (gen-sentence probs first-word size)))
-
-#_(def bible-words
-  (file-to-strings "resources/sample_texts/pgsmall.txt"))
-
-#_(def divina
-  (file-to-strings "resources/sample_texts/divinacommedia.txt"))
+    (cons first-word (gen-sentence-loop probs first-word size))))
 
 (def cli-options
   ;; An option with a required argument
