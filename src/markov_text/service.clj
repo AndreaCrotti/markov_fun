@@ -12,15 +12,14 @@
 
 (defn bible-page
   [request]
-  {:quote "And god made the light"})
+  (let [])
+  (ring-resp/response
+   ""))
 
 (defn home-page
   [request]
-  (ring-resp/response "Hello World 2!"))
+  (ring-resp/response "Hello World again!"))
 
-;; Defines "/" and "/about" routes with their associated :get handlers.
-;; The interceptors defined after the verb map (e.g., {:get home-page}
-;; apply to / and its children (/about).
 (def common-interceptors [(body-params/body-params) http/html-body])
 
 (def json-interceptors [(body-params/body-params) http/json-body])

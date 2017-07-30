@@ -27,6 +27,7 @@
   ;; :main ^{:skip-aot true} sample-pedestal.server
   :profiles {:dev {:aliases
                    {"run-dev" ["trampoline" "run" "-m" "markov-text.server/run-dev"]
-                    "run-prod" ["run" "-m" "markov-text.server/run"]}
+                    "run-prod" ["run" "-m" "markov-text.server/run"]
+                    "cli" ["run" "-m" "markov-text.core/-main"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.2"]]}
              :uberjar {:aot [sample-pedestal.server]}})

@@ -107,10 +107,31 @@
 
 (def cli-options
   ;; An option with a required argument
-  [["-f" "--file" "File to use to generate the sentences from"] 
+  [["-f" "--file" "File to use to generate the sentences from"
+    :required true]
+
+   ["-s" "--size" "Size of the words to generate"
+    :default 10
+    :parse-fn #(Integer/parseInt %)
+    :validate [#(pos? %) "Positive number of words please"]]
+
+   ["-n" "--number" "Number of sentences to generate"
+    :validate [#(pos? %) "Positive number of sentences"]
+    :parse-fn #(Integer/parseInt %)
+    :default 1]
+
    ["-h" "--help"]])
+
 
 (defn -main
   [& args]
-  (let [options (parse-opts args cli-options)]
-    (prn options)))
+  (let [options (parse-opts args cli-options)
+        file-name (nth args 1)
+        num-sentences (-> options :options :number)
+        size-sentence (-> options :options :size)
+        words (file-to-strings file-name)]
+
+    (doseq [n (range num-sentences)]
+      (println (clojure.string/join
+                " "
+                (gen-string words size-sentence))))))

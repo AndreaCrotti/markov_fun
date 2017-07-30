@@ -34,7 +34,8 @@
   (server/start runnable-service))
 
 ;; If you package the service up as a WAR,
-;; some form of the following function sections is required (for io.pedestal.servlet.ClojureVarServlet).
+;; some form of the following function sections is required
+;; (for io.pedestal.servlet.ClojureVarServlet).
 
 ;;(defonce servlet  (atom nil))
 ;;
