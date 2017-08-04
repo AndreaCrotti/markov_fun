@@ -21,7 +21,10 @@
                  #_[im.chit/lucid.package "1.3.13"]]
 
   :resource-paths ["config" "resources"]
-  :min-lein-version "2.0.0"
+  :min-lein-version "2.7.1"
+  :source-paths ["src/clj" "src/cljc"]
+  :test-paths ["test/clj" "test/cljc"]
+
   :main markov-text.core
   ;; do we need this instead??
   ;; :main ^{:skip-aot true} sample-pedestal.server
