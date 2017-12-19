@@ -3,15 +3,15 @@
   :url "https://github.com/AndreaCrotti/markov_fun"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-  :dependencies [[org.clojure/clojure "1.8.0"]
-                 [com.rpl/specter "1.0.2"]
+  :dependencies [[org.clojure/clojure "1.9.0"]
+                 [com.rpl/specter "1.0.5"]
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/tools.cli "0.3.5"]
-                 [instaparse "1.4.7"]
+                 [instaparse "1.4.8"]
                  [aysylu/loom "1.0.0"]
                  ;; pedestal related code
-                 [io.pedestal/pedestal.service "0.5.2"]
-                 [io.pedestal/pedestal.jetty "0.5.2"]
+                 [io.pedestal/pedestal.service "0.5.3"]
+                 [io.pedestal/pedestal.jetty "0.5.3"]
 
                  [ch.qos.logback/logback-classic "1.2.3" :exclusions [org.slf4j/slf4j-api]]
                  [org.slf4j/jul-to-slf4j "1.7.25"]
@@ -29,5 +29,5 @@
                    {"run-dev" ["trampoline" "run" "-m" "markov-text.server/run-dev"]
                     "run-prod" ["run" "-m" "markov-text.server/run"]
                     "cli" ["run" "-m" "markov-text.core/-main"]}
-                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.2"]]}
+                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]]}
              :uberjar {:aot [sample-pedestal.server]}})
