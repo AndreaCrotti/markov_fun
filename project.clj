@@ -7,27 +7,10 @@
                  [com.rpl/specter "1.0.5"]
                  [org.clojure/test.check "0.9.0"]
                  [org.clojure/tools.cli "0.3.5"]
-                 [instaparse "1.4.8"]
-                 [aysylu/loom "1.0.0"]
-                 ;; pedestal related code
-                 [io.pedestal/pedestal.service "0.5.3"]
-                 [io.pedestal/pedestal.jetty "0.5.3"]
-
-                 [ch.qos.logback/logback-classic "1.2.3" :exclusions [org.slf4j/slf4j-api]]
-                 [org.slf4j/jul-to-slf4j "1.7.25"]
-                 [org.slf4j/jcl-over-slf4j "1.7.25"]
-                 [org.slf4j/log4j-over-slf4j "1.7.25"]
-                 #_[im.chit/lucid.aether "1.3.13"]
-                 #_[im.chit/lucid.package "1.3.13"]]
+                 [aysylu/loom "1.0.0"]]
 
   :resource-paths ["config" "resources"]
   :min-lein-version "2.0.0"
   :main markov-text.core
-  ;; do we need this instead??
-  ;; :main ^{:skip-aot true} sample-pedestal.server
   :profiles {:dev {:aliases
-                   {"run-dev" ["trampoline" "run" "-m" "markov-text.server/run-dev"]
-                    "run-prod" ["run" "-m" "markov-text.server/run"]
-                    "cli" ["run" "-m" "markov-text.core/-main"]}
-                   :dependencies [[io.pedestal/pedestal.service-tools "0.5.3"]]}
-             :uberjar {:aot [sample-pedestal.server]}})
+                   {"cli" ["run" "-m" "markov-text.core/-main"]}}})
